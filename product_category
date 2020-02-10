@@ -1,0 +1,39 @@
+*** SETTINGS ***
+Library   SeleniumLibrary
+Library   DatabasesLibrary
+Library   String
+
+
+*** VARIABLES ***
+${mainPage}       http://automationpractice.com/index.php
+${womenCategory}  id=womenCategory
+${dressCategory}  id=dressCategory
+${tshirtCategory} id=tshirtCategory
+${dbUrl}    testdb.rds.amazonaws.com
+${dbName}   webshopdb
+${dbUser}   axpostgres
+${dbPass}   ax@123labs
+${dbPort}   5432
+
+*** TEST CASES ***
+Check Product Categories Functionality
+  Open Webpage
+  Click Product Categories
+  Compare Data With Databases
+  
+*** KEYWORDS ***
+Open Webpage
+    Open Browser    ${mainPage}   chrome
+    Wait Until Page Contains      Sign In
+    Sleep     1s
+
+Connect to DB
+  Connect To Database  psycopg2   ${dbName}   ${dbUser}   ${dbpass}   ${dburl}    ${dbport}
+
+Click Product Categories
+    Click Element   ${womenCategory}
+    ${totalWomenItem}=  Get Text    id=total_item
+    
+Compare Data With Databases
+    ${totalWomenDb}=  Query   SELECT count(pubid) FROM webshop.products_categories WHERE parent_categories = 'WOMEN';
+    Should be equal ${totalWomenItem}     ${totalWomenDb}
